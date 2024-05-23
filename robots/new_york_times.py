@@ -20,7 +20,22 @@ article_thumbnail_class = 'css-rq4mmj'
 
 
 class NewYorkTimesRobot:
+    """
+    A class to represent a robot for scraping articles from the New York Times website.
+    """
+
     def __init__(self, browser: Selenium, browser_options: Options, config: RobotConfig) -> None:
+        """
+        Initialize the NewYorkTimesRobot with the provided browser, browser options, and configuration.
+
+        Args:
+            browser: An instance of the Selenium browser automation class.
+            browser_options: Browser options for Selenium.
+            config: Configuration for the robot, including search phrase and date range.
+
+        Returns:
+            None
+        """
         self.browser = browser
         self.browser_options = browser_options
         self.config = config
@@ -31,6 +46,15 @@ class NewYorkTimesRobot:
         self.search_url = f"{nytimes_url}/search?query={config.search_phrase}&sort=newest&startDate={start_date}&endDate={end_date}"
 
     def open(self):
+        """
+        Open the New York Times search page with the specified URL and options.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.browser.open_available_browser(
             url=self.search_url,
             headless=False,
@@ -40,10 +64,28 @@ class NewYorkTimesRobot:
         )
 
     def accept_cookies(self):
+        """
+        Accept cookies on the New York Times website.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.browser.click_button_when_visible(
             '//button[@data-testid="Accept all-btn"]')
 
     def select_sections(self):
+        """
+        Select sections on the New York Times website based on the configuration.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         # open the sections dropdown
         self.browser.click_button_when_visible(sections_button_locator)
 
@@ -56,6 +98,18 @@ class NewYorkTimesRobot:
         self.browser.click_button_when_visible(sections_button_locator)
 
     def download_thumbnail(self, article_element):
+        """
+        Download the thumbnail image of an article.
+
+        Args:
+            article_element: The web element representing the article.
+
+        Returns:
+            str: The filename of the downloaded thumbnail, or None if the thumbnail is not found.
+
+        Raises:
+            Exception: If the thumbnail is not found.
+        """
         try:
             thumbnail = article_element.find_element(
                 By.CLASS_NAME, article_thumbnail_class).get_attribute('src')
@@ -69,6 +123,18 @@ class NewYorkTimesRobot:
             return None
 
     def get_article_title(self, article_element):
+        """
+        Retrieve the title of an article.
+
+        Args:
+            article_element: The web element representing the article.
+
+        Returns:
+            str: The title of the article, or an empty string if the title is not found.
+
+        Raises:
+            Exception: If the title is not found.
+        """
         try:
             title = article_element.find_element(
                 By.CLASS_NAME, article_title_class).text
@@ -78,6 +144,18 @@ class NewYorkTimesRobot:
             return ''
 
     def get_article_description(self, article_element):
+        """
+        Retrieve the description of an article.
+
+        Args:
+            article_element: The web element representing the article.
+
+        Returns:
+            str: The description of the article, or an empty string if the description is not found.
+
+        Raises:
+            Exception: If the description is not found.
+        """
         try:
             description = article_element.find_element(
                 By.CLASS_NAME, article_description_class).text
@@ -87,15 +165,39 @@ class NewYorkTimesRobot:
             return ''
 
     def get_article_date(self, article_element):
+        """
+        Retrieve the date of an article.
+
+        Args:
+            article_element: The web element representing the article.
+
+        Returns:
+            str: The date of the article, or an empty string if the date is not found.
+
+        Raises:
+            Exception: If the date is not found.
+        """
         try:
             description = article_element.find_element(
-                By.CLASS_NAME, article_description_class).text
+                By.CLASS_NAME, article_date_class).text
             return description
         except Exception:
             log.error("Date not found")
             return ''
 
     def scrape_articles(self) -> List[Article]:
+        """
+        Scrape articles from the New York Times website.
+
+        Args:
+            None
+
+        Returns:
+            List[Article]: A list of Article objects containing the scraped data.
+
+        Raises:
+            Exception: If scraping fails.
+        """
         self.browser.wait_until_element_is_visible(article_locator)
 
         articles = []
@@ -120,6 +222,19 @@ class NewYorkTimesRobot:
         return articles
 
     def run(self):
+        """
+        Execute the full process of opening the browser, accepting cookies, selecting sections,
+        scraping articles, and closing the browser.
+
+        Args:
+            None
+
+        Returns:
+            List[Article]: A list of Article objects containing the scraped data.
+
+        Raises:
+            Exception: If the process fails.
+        """
         self.open()
         self.accept_cookies()
         self.select_sections()

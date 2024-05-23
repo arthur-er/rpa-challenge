@@ -12,6 +12,7 @@ from robots.new_york_times import NewYorkTimesRobot
 
 @task
 def scrape_articles():
+    """ Task to scrape articles from The New York Times """
     try:
         log.info('Creating thumbnails folder')
         Path('output/thumbnails').mkdir(parents=True, exist_ok=True)
@@ -34,6 +35,7 @@ def scrape_articles():
         dataframe.to_csv(f'output/{config.output_file}.csv', index=False)
         log.info(
             f"Exported {len(articles)} articles to {config.output_file}.csv")
-
+    except Exception:
+        log.exception("An error occurred while running the automation.")
     finally:
         log.info("Automation finished!")
